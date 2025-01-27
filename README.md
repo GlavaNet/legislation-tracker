@@ -17,7 +17,7 @@ Track federal and state legislation and executive orders.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/legislation-tracker.git
+git clone https://github.com/glavanet/legislation-tracker.git
 cd legislation-tracker
 ```
 
