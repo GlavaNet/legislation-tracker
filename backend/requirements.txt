@@ -1,0 +1,55 @@
+# API Framework
+fastapi==0.104.0
+uvicorn==0.24.0
+pydantic==2.4.2
+pydantic-settings==2.0.3
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+sqlite3==3.35.0
+
+# HTTP and Scraping
+requests==2.31.0
+beautifulsoup4==4.12.2
+html5lib==1.1
+lxml==4.9.3
+
+# Rate Limiting and Caching
+ratelimit==2.2.1
+redis==5.0.1
+cachetools==5.3.2
+
+# Data Processing
+python-dateutil==2.8.2
+pytz==2023.3.post1
+
+# Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.1
+pytest-cov==4.1.0
+
+# Code Quality
+black==23.10.1
+flake8==6.1.0
+mypy==1.6.1
+isort==5.12.0
+
+# Development Tools
+python-dotenv==1.0.0
+pre-commit==3.5.0
+
+# Logging and Monitoring
+structlog==23.2.0
+prometheus-client==0.18.0
+
+# Documentation
+mkdocs==1.5.3
+mkdocs-material==9.4.7
+mkdocstrings==0.23.0
