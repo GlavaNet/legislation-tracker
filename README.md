@@ -223,16 +223,3 @@ cd backend
 alembic downgrade base
 alembic upgrade head
 ```
-
-## Support
-
-- GitHub Issues: Project issues and feature requests
-- Documentation: Check the /docs directory
-- Email: support@example.com
-
-## Roadmap
-
-- Additional state legislature support
-- Enhanced search capabilities
-- Real-time updates
-- Mobile application
