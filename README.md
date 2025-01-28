@@ -36,7 +36,7 @@ Before running the application, you'll need to obtain the following API keys:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/legislation-tracker.git
+git clone https://github.com/glavanet/legislation-tracker.git
 cd legislation-tracker
 ```
 
