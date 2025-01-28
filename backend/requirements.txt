@@ -7,7 +7,6 @@ pydantic-settings==2.0.3
 # Database
 sqlalchemy==2.0.23
 alembic==1.12.1
-sqlite3==3.35.0
 
 # HTTP and Scraping
 requests==2.31.0
