@@ -1,6 +1,7 @@
 import requests
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
+from ratelimit import limits, sleep_and_retry
 from .base import BaseScraper, RateLimitError
 
 class FederalRegisterScraper(BaseScraper):
@@ -24,7 +25,7 @@ class FederalRegisterScraper(BaseScraper):
             return response.json()
             
         except requests.exceptions.RequestException as e:
-            self.logger.error(f"Error making request to Federal Register: {str(e)}")
+            self.logger.error(f"Error making request to Federal Register: {e}")
             raise
 
     def scrape(self, days: int = 30) -> List[Dict[str, Any]]:
@@ -33,8 +34,8 @@ class FederalRegisterScraper(BaseScraper):
             start_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
             
             params = {
-                "conditions[type]": "PRESDOCU",
-                "conditions[presidential_document_type]": "executive_order",
+                "conditions[type][]": "PRESDOCU",
+                "conditions[presidential_document_type][]": "executive_order",
                 "conditions[publication_date][gte]": start_date,
                 "per_page": 100,
                 "order": "newest"
@@ -44,21 +45,28 @@ class FederalRegisterScraper(BaseScraper):
             legislation_list = []
             
             for item in data.get("results", []):
+                # Extract the executive order number from the document number
+                # Document numbers are typically in the format "E.O. 12345" or similar
+                doc_number = item.get('document_number', '')
+                eo_number = ''.join(filter(str.isdigit, doc_number))
+
                 legislation = {
-                    "id": f"executive_{item['executive_order_number']}",
+                    "id": f"executive_{eo_number}" if eo_number else f"executive_{doc_number}",
                     "type": "executive",
-                    "title": item["title"],
+                    "title": item.get("title", ""),
                     "summary": item.get("abstract", ""),
                     "status": "signed",
                     "introduced_date": datetime.strptime(
-                        item["signing_date"], "%Y-%m-%d"
+                        item.get("publication_date", start_date), 
+                        "%Y-%m-%d"
                     ),
-                    "source_url": item["html_url"],
-                    "metadata": {
-                        "executive_order_number": item["executive_order_number"],
-                        "president": item.get("president"),
-                        "full_text": item.get("body_html"),
-                        "citation": item.get("citation")
+                    "source_url": item.get("html_url", ""),
+                    "extra_data": {
+                        "document_number": doc_number,
+                        "executive_order_number": eo_number,
+                        "president": item.get("president", ""),
+                        "full_text": item.get("body_html", ""),
+                        "citation": item.get("citation", "")
                     }
                 }
                 legislation_list.append(legislation)
@@ -67,5 +75,5 @@ class FederalRegisterScraper(BaseScraper):
             return legislation_list
             
         except Exception as e:
-            self.logger.error(f"Error scraping Federal Register: {str(e)}")
+            self.logger.error(f"Error scraping Federal Register: {e}")
             raise

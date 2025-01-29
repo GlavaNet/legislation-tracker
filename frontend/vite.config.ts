@@ -6,18 +6,18 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@utils': path.resolve(__dirname, './src/utils')
+      '@': path.resolve(__dirname, './src')
     }
   },
   server: {
     port: 3000,
+    host: true,
     proxy: {
-      '/api': {
+      '/api/v1': {
         target: 'http://localhost:8000',
-        changeOrigin: true
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path
       }
     }
   }

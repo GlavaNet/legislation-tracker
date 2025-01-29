@@ -1,6 +1,7 @@
-import requests
 from datetime import datetime
 from typing import List, Dict, Any
+import requests
+from ratelimit import limits, sleep_and_retry
 from .base import BaseScraper, APIKeyMissingError, RateLimitError
 
 class CongressScraper(BaseScraper):
@@ -15,10 +16,13 @@ class CongressScraper(BaseScraper):
     def _make_request(self, endpoint: str) -> Dict[str, Any]:
         """Make rate-limited API request"""
         url = f"{self.base_url}/{endpoint}"
-        headers = {"X-API-Key": self.api_key}
+        params = {
+            "api_key": self.api_key,
+            "format": "json"
+        }
         
         try:
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, params=params)
             
             if response.status_code == 429:
                 raise RateLimitError("Congress.gov API rate limit exceeded")
@@ -27,13 +31,15 @@ class CongressScraper(BaseScraper):
             return response.json()
             
         except requests.exceptions.RequestException as e:
-            self.logger.error(f"Error making request to Congress.gov: {str(e)}")
+            self.logger.error(f"Error making request to Congress.gov: {e}")
             raise
 
     def scrape(self) -> List[Dict[str, Any]]:
         """Scrape federal legislation"""
         try:
-            data = self._make_request("bills")
+            # Get the current Congress (118th as of 2024)
+            congress_number = "118"
+            data = self._make_request(f"bill/{congress_number}")
             legislation_list = []
             
             for item in data.get("bills", []):
@@ -45,12 +51,12 @@ class CongressScraper(BaseScraper):
                     "status": item.get("status", ""),
                     "introduced_date": datetime.strptime(
                         item["introducedDate"], "%Y-%m-%d"
-                    ),
+                    ) if "introducedDate" in item else None,
                     "last_action_date": datetime.strptime(
                         item["latestAction"]["actionDate"], "%Y-%m-%d"
                     ) if item.get("latestAction") else None,
                     "source_url": item.get("congressdotgov_url", ""),
-                    "metadata": {
+                    "extra_data": {
                         "congress": item.get("congress"),
                         "bill_type": item.get("type"),
                         "bill_number": item.get("number"),
@@ -64,5 +70,5 @@ class CongressScraper(BaseScraper):
             return legislation_list
             
         except Exception as e:
-            self.logger.error(f"Error scraping Congress.gov: {str(e)}")
+            self.logger.error(f"Error scraping Congress.gov: {e}")
             raise

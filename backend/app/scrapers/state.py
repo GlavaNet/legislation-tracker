@@ -1,6 +1,8 @@
-import requests
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+import requests
+from bs4 import BeautifulSoup
+from ratelimit import limits, sleep_and_retry
 from .base import BaseScraper, APIKeyMissingError
 
 class StateLegislatureScraper(BaseScraper):
@@ -90,7 +92,7 @@ class StateLegislatureScraper(BaseScraper):
                     item["publishedDate"], "%Y-%m-%d"
                 ),
                 "source_url": item.get("url", ""),
-                "metadata": {
+               "extra_data": {  # Changed from metadata to extra_data
                     "state": "NY",
                     "bill_id": item.get("printNo"),
                     "session": item.get("session")

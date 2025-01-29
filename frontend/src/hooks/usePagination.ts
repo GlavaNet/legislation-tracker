@@ -1,21 +1,16 @@
 import { useMemo } from 'react';
 
-interface UsePaginationProps {
-  totalItems: number;
-  pageSize: number;
-  currentPage: number;
-  siblingCount?: number;
-}
-
 export const usePagination = ({
   totalItems,
   pageSize,
-  currentPage,
-  siblingCount = 1
-}: UsePaginationProps) => {
+  currentPage
+}: {
+  totalItems: number;
+  pageSize: number;
+  currentPage: number;
+}) => {
   return useMemo(() => {
     const totalPages = Math.ceil(totalItems / pageSize);
-    const pages = generatePaginationArray(totalPages, currentPage, siblingCount);
-    return pages;
-  }, [totalItems, pageSize, currentPage, siblingCount]);
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }, [totalItems, pageSize, currentPage]);
 };
