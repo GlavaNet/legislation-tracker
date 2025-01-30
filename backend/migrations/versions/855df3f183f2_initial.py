@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: 905da6b1cd5d
+Revision ID: 855df3f183f2
 Revises: 
-Create Date: 2025-01-28 00:25:17.354788
+Create Date: 2025-01-29 00:16:22.350710
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '905da6b1cd5d'
+revision: str = '855df3f183f2'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('type', sa.Enum('FEDERAL', 'STATE', 'EXECUTIVE', name='legislationtype'), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('summary', sa.String(), nullable=True),
-    sa.Column('status', sa.Enum('ACTIVE', 'PENDING', 'PASSED', 'FAILED', 'SIGNED', 'VETOED', name='status'), nullable=True),
+    sa.Column('status', sa.Enum('ACTIVE', 'PENDING', 'PASSED', 'FAILED', 'SIGNED', 'VETOED', name='status'), server_default='PENDING', nullable=False),
     sa.Column('introduced_date', sa.DateTime(), nullable=True),
     sa.Column('last_action_date', sa.DateTime(), nullable=True),
     sa.Column('source_url', sa.String(), nullable=True),

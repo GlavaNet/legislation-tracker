@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, DateTime, JSON, Enum as SQLEnum, ForeignKey
+from sqlalchemy import Column, String, DateTime, JSON, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
@@ -6,18 +6,18 @@ from ..database import Base
 
 class LegislationType(str, enum.Enum):
     """Type of legislation"""
-    FEDERAL = "federal"
-    STATE = "state"
-    EXECUTIVE = "executive"
+    FEDERAL = "FEDERAL"
+    STATE = "STATE"
+    EXECUTIVE = "EXECUTIVE"
 
 class Status(str, enum.Enum):
     """Status of legislation"""
-    ACTIVE = "active"
-    PENDING = "pending"
-    PASSED = "passed"
-    FAILED = "failed"
-    SIGNED = "signed"
-    VETOED = "vetoed"
+    ACTIVE = "ACTIVE"      # In progress through legislative process
+    PENDING = "PENDING"    # Awaiting action
+    PASSED = "PASSED"      # Passed by legislature, awaiting executive action
+    FAILED = "FAILED"      # Did not pass
+    SIGNED = "SIGNED"      # Signed into law
+    VETOED = "VETOED"      # Vetoed by executive
 
 class LegislativeAction(Base):
     """Model for tracking legislative actions"""
@@ -42,10 +42,10 @@ class Legislation(Base):
     __tablename__ = "legislation"
 
     id = Column(String, primary_key=True)
-    type = Column(SQLEnum(LegislationType), nullable=False)
+    type = Column(Enum(LegislationType), nullable=False)
     title = Column(String, nullable=False)
     summary = Column(String)
-    status = Column(SQLEnum(Status))
+    status = Column(Enum(Status), nullable=False, server_default=Status.PENDING.value)
     introduced_date = Column(DateTime)
     last_action_date = Column(DateTime)
     source_url = Column(String)
@@ -61,12 +61,10 @@ class Legislation(Base):
 
     @property
     def current_status(self) -> str:
-        """Get the current status of the legislation"""
         return self.status.value if self.status else "unknown"
 
     @property
     def days_since_introduction(self) -> int:
-        """Calculate days since introduction"""
         if not self.introduced_date:
             return 0
         delta = func.now() - self.introduced_date
@@ -74,14 +72,12 @@ class Legislation(Base):
 
     @property
     def days_since_last_action(self) -> int:
-        """Calculate days since last action"""
         if not self.last_action_date:
             return 0
         delta = func.now() - self.last_action_date
         return delta.days
 
     def add_action(self, action_type: str, description: str, extra_data: dict = None) -> LegislativeAction:
-        """Add a new action to this legislation"""
         from uuid import uuid4
         
         action = LegislativeAction(
@@ -97,13 +93,14 @@ class Legislation(Base):
         return action
 
     def update_status(self, new_status: Status) -> None:
-        """Update the status and record it as an action"""
+        if not isinstance(new_status, Status):
+            raise ValueError(f"Expected Status enum, got {type(new_status)}")
+            
         old_status = self.status
-        self.status = new_status
-        
         if old_status != new_status:
+            self.status = new_status
             self.add_action(
                 action_type="status_change",
-                description=f"Status changed from {old_status} to {new_status}",
-                extra_data={"old_status": old_status, "new_status": new_status}
+                description=f"Status changed from {old_status.value} to {new_status.value}",
+                extra_data={"old_status": old_status.value, "new_status": new_status.value}
             )

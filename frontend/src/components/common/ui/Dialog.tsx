@@ -1,21 +1,31 @@
 import React from 'react';
 
-export const Dialog = ({ children, open = false }: { children: React.ReactNode; open?: boolean }) => (
-  open ? <div className="fixed inset-0 bg-black/50 flex items-center justify-center">{children}</div> : null
+interface DialogProps {
+  children: React.ReactNode;
+  open: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export const Dialog: React.FC<DialogProps> = ({ children, open }) => {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 relative">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export const DialogContent: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="p-6">{children}</div>
 );
 
-export const DialogTitle = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="text-lg font-semibold">{children}</h2>
-);
-
-export const DialogContent = ({ children }: { children: React.ReactNode }) => (
-  <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4">{children}</div>
-);
-
-export const DialogHeader = ({ children }: { children: React.ReactNode }) => (
+export const DialogHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="mb-4">{children}</div>
 );
 
-export const DialogClose = ({ children }: { children: React.ReactNode }) => (
-  <button className="absolute top-4 right-4">{children}</button>
+export const DialogTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <h2 className="text-xl font-semibold">{children}</h2>
 );

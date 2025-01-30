@@ -12,28 +12,28 @@ def main():
     db = SessionLocal()
     try:
         federal_count = db.query(Legislation).filter(
-            Legislation.type == LegislationType.FEDERAL
+            Legislation.type == LegislationType.FEDERAL.value
         ).count()
         
         state_count = db.query(Legislation).filter(
-            Legislation.type == LegislationType.STATE
+            Legislation.type == LegislationType.STATE.value
         ).count()
         
-        executive_count = db.query(Legislation).filter(
-            Legislation.type == LegislationType.EXECUTIVE
+        exec_count = db.query(Legislation).filter(
+            Legislation.type == LegislationType.EXECUTIVE.value
         ).count()
         
         print("\nDatabase Contents:")
         print(f"Federal Bills: {federal_count}")
         print(f"State Bills: {state_count}")
-        print(f"Executive Orders: {executive_count}")
+        print(f"Executive Orders: {exec_count}")
         
-        # Show some sample data
-        print("\nSample Items:")
-        for type_ in [LegislationType.FEDERAL, LegislationType.STATE, LegislationType.EXECUTIVE]:
-            items = db.query(Legislation).filter(Legislation.type == type_).limit(3).all()
+        for type_ in [LegislationType.FEDERAL.value, LegislationType.STATE.value, LegislationType.EXECUTIVE.value]:
+            items = db.query(Legislation).filter(
+                Legislation.type == type_
+            ).limit(3).all()
             if items:
-                print(f"\n{type_.value.title()} Items:")
+                print(f"\n{type_.title()} Items:")
                 for item in items:
                     print(f"- {item.title[:100]}...")
     finally:

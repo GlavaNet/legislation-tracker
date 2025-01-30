@@ -1,7 +1,5 @@
-import React from 'react';
-
-export const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`bg-white rounded-lg shadow ${className}`}>{children}</div>
+export const Card = ({ children, className = '', onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }) => (
+  <div onClick={onClick} role="button" className={`bg-white rounded-lg shadow ${className}`}>{children}</div>
 );
 
 export const CardHeader = ({ children }: { children: React.ReactNode }) => (
