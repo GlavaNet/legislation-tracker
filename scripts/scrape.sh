@@ -8,15 +8,7 @@ NC='\033[0m'
 
 echo -e "${YELLOW}Starting data scraping...${NC}"
 
-cd backend
-source venv/bin/activate
-
-# Run the scrapers
-if [ "$1" == "--clear" ]; then
-    echo -e "${YELLOW}Clearing existing data...${NC}"
-    python run_scrapers.py --clear
-else
-    python run_scrapers.py
-fi
+# Run scrapers through Docker with proper virtual environment activation
+docker-compose exec web bash -c "source /app/app/venv/bin/activate && cd /app && python3 run_scrapers.py"
 
 echo -e "${GREEN}Scraping complete!${NC}"

@@ -4,6 +4,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
@@ -20,10 +21,11 @@ RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 ENV PYTHONPATH="/app:$PYTHONPATH"
 
-COPY --chown=appuser:appuser requirements.txt .
-RUN pip install -r requirements.txt
+COPY --chown=appuser:appuser requirements.txt /app/
+RUN /app/venv/bin/pip install -r requirements.txt && \
+    /app/venv/bin/pip install celery redis
 
-COPY --chown=appuser:appuser . .
+COPY --chown=appuser:appuser . /app/
 
 # Create directories needed for Celery
 RUN mkdir -p /app/celery/{beat,worker} && \
